@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Account {
+  id          Int                  @id @default(autoincrement())
+  code        String               @unique
+  name        String
+  type        AccountType
+  balance     Decimal              @default(0) @db.Decimal(10, 2)
+  entries     TransactionEntry[]
+  description String?
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+
+  @@map("accounts")
+}
+
+model Transaction {
+  id          Int                  @id @default(autoincrement())
+  date        DateTime             @default(now())
+  description String
+  entries     TransactionEntry[]   // Remove onDelete from here
+  reference   String?
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+
+  @@map("transactions")
+}
+
+model TransactionEntry {
+  id            Int         @id @default(autoincrement())
+  transactionId Int
+  accountId     Int
+  debit         Decimal     @default(0) @db.Decimal(10, 2)
+  credit        Decimal     @default(0) @db.Decimal(10, 2)
+  createdAt     DateTime    @default(now())
+
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  account       Account     @relation(fields: [accountId], references: [id])
+
+  @@unique([transactionId, accountId])
+  @@map("transaction_entries")
+}
+
+enum AccountType {
+  ASSET
+  LIABILITY
+  EQUITY
+  REVENUE
+  EXPENSE
+}
