@@ -1,18 +1,19 @@
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-
-interface Params {
-  params: {
-    id: string;
-  };
+// In Next.js 14 App Router, params is a Promise
+interface Context {
+  params: Promise<{ id: string }>;
 }
 
 // GET single account
-export async function GET(request: NextRequest, { params }: Params) {
+export async function GET(request: NextRequest, { params }: Context) {
   try {
+    // ✅ AWAIT params first!
+    const { id } = await params;
+
     const account = await prisma.account.findUnique({
-      where: { id: parseInt(params.id) },
+      where: { id: parseInt(id) },
       include: {
         entries: {
           include: {
@@ -39,16 +40,15 @@ export async function GET(request: NextRequest, { params }: Params) {
 }
 
 // PUT update account
-export async function PUT(request: NextRequest, { params }: Params) {
+export async function PUT(request: NextRequest, { params }: Context) {
   try {
+    // ✅ AWAIT params first!
+    const { id } = await params;
     const body = await request.json();
     const { name, description } = body;
 
-    // Note: We shouldn't allow changing code or type after creation
-    // as it would break existing transactions
-
     const account = await prisma.account.update({
-      where: { id: parseInt(params.id) },
+      where: { id: parseInt(id) },
       data: {
         name,
         description,
@@ -66,11 +66,14 @@ export async function PUT(request: NextRequest, { params }: Params) {
 }
 
 // DELETE account (only if no transactions)
-export async function DELETE(request: NextRequest, { params }: Params) {
+export async function DELETE(request: NextRequest, { params }: Context) {
   try {
+    // ✅ AWAIT params first!
+    const { id } = await params;
+
     // Check if account has any entries
     const accountWithEntries = await prisma.account.findUnique({
-      where: { id: parseInt(params.id) },
+      where: { id: parseInt(id) },
       include: { entries: true },
     });
 
@@ -86,7 +89,7 @@ export async function DELETE(request: NextRequest, { params }: Params) {
     }
 
     await prisma.account.delete({
-      where: { id: parseInt(params.id) },
+      where: { id: parseInt(id) },
     });
 
     return NextResponse.json(

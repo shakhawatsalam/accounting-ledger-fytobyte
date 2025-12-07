@@ -25,9 +25,18 @@ import IncomeStatement from "@/components/reports/IncomeStatement";
 import JournalReport from "@/components/reports/JournalReport";
 
 export default function ReportsPage() {
-  const [startDate, setStartDate] = useState<Date>();
-  const [endDate, setEndDate] = useState<Date>(new Date());
+  const [startDate, setStartDate] = useState<Date | undefined>();
+  const [endDate, setEndDate] = useState<Date | undefined>(new Date());
   const [activeTab, setActiveTab] = useState("balance");
+
+  // Handle date selection
+  const handleStartDateSelect = (date: Date | undefined) => {
+    setStartDate(date);
+  };
+
+  const handleEndDateSelect = (date: Date | undefined) => {
+    setEndDate(date);
+  };
 
   return (
     <div className='space-y-6'>
@@ -74,8 +83,9 @@ export default function ReportsPage() {
                     <Calendar
                       mode='single'
                       selected={startDate}
-                      onSelect={setStartDate}
+                      onSelect={handleStartDateSelect}
                       initialFocus
+                      required={false}
                     />
                   </PopoverContent>
                 </Popover>
@@ -96,8 +106,9 @@ export default function ReportsPage() {
                     <Calendar
                       mode='single'
                       selected={endDate}
-                      onSelect={setEndDate}
+                      onSelect={handleEndDateSelect}
                       initialFocus
+                      required={false}
                     />
                   </PopoverContent>
                 </Popover>

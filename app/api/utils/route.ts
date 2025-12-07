@@ -1,6 +1,7 @@
+import { AccountType } from "@/lib/generated/prisma/enums";
 import prisma from "@/lib/prisma";
-import { NextRequest, NextResponse } from "next/server";
 
+import { NextRequest, NextResponse } from "next/server";
 
 // Health check and utilities
 export async function GET(request: NextRequest) {
@@ -74,22 +75,57 @@ export async function POST(request: NextRequest) {
 }
 
 async function seedTestData() {
-  // Create default accounts
+  // Create default accounts with proper enum types
   const accounts = [
-    { code: "1001", name: "Cash", type: "ASSET", balance: 10000 },
-    { code: "1002", name: "Accounts Receivable", type: "ASSET", balance: 5000 },
+    { code: "1001", name: "Cash", type: AccountType.ASSET, balance: 10000 },
+    {
+      code: "1002",
+      name: "Accounts Receivable",
+      type: AccountType.ASSET,
+      balance: 5000,
+    },
     {
       code: "2001",
       name: "Accounts Payable",
-      type: "LIABILITY",
+      type: AccountType.LIABILITY,
       balance: 3000,
     },
-    { code: "3001", name: "Owner's Capital", type: "EQUITY", balance: 12000 },
-    { code: "4001", name: "Sales Revenue", type: "REVENUE", balance: 0 },
-    { code: "4002", name: "Service Revenue", type: "REVENUE", balance: 0 },
-    { code: "5001", name: "Rent Expense", type: "EXPENSE", balance: 0 },
-    { code: "5002", name: "Utilities Expense", type: "EXPENSE", balance: 0 },
-    { code: "5003", name: "Salary Expense", type: "EXPENSE", balance: 0 },
+    {
+      code: "3001",
+      name: "Owner's Capital",
+      type: AccountType.EQUITY,
+      balance: 12000,
+    },
+    {
+      code: "4001",
+      name: "Sales Revenue",
+      type: AccountType.REVENUE,
+      balance: 0,
+    },
+    {
+      code: "4002",
+      name: "Service Revenue",
+      type: AccountType.REVENUE,
+      balance: 0,
+    },
+    {
+      code: "5001",
+      name: "Rent Expense",
+      type: AccountType.EXPENSE,
+      balance: 0,
+    },
+    {
+      code: "5002",
+      name: "Utilities Expense",
+      type: AccountType.EXPENSE,
+      balance: 0,
+    },
+    {
+      code: "5003",
+      name: "Salary Expense",
+      type: AccountType.EXPENSE,
+      balance: 0,
+    },
   ];
 
   for (const account of accounts) {

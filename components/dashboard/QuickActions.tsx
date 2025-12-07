@@ -5,31 +5,21 @@ import { Button } from "@/components/ui/button";
 
 import { PlusCircle } from "lucide-react";
 import { AddTransactionDialog } from "@/components/transactions/AddTransactionDialog";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 export default function QuickActions() {
   const [showAddDialog, setShowAddDialog] = useState(false);
-  const { toast } = useToast();
 
   const handleQuickAction = (action: string) => {
     switch (action) {
       case "recalculate":
-        toast({
-          title: "Recalculating balances...",
-          description: "Account balances are being updated.",
-        });
+        toast("Account balances are being updated.");
         break;
       case "export":
-        toast({
-          title: "Export started",
-          description: "Your data export has been queued.",
-        });
+        toast("Your data export has been queued.");
         break;
       case "report":
-        toast({
-          title: "Report generated",
-          description: "Financial report is ready for download.",
-        });
+        toast("Financial report is ready for download.");
         break;
     }
   };

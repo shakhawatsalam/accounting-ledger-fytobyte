@@ -236,8 +236,14 @@ export function EditTransactionDialog({
                           <Calendar
                             mode='single'
                             selected={field.value}
-                            onSelect={field.onChange}
+                            onSelect={(date) => {
+                              // Handle undefined case
+                              if (date) {
+                                field.onChange(date);
+                              }
+                            }}
                             initialFocus
+                            required={false}
                           />
                         </PopoverContent>
                       </Popover>
