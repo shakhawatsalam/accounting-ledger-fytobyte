@@ -7,17 +7,19 @@ import {
 } from "@/lib/validation";
 import prisma from "@/lib/prisma";
 
+// Define params as a Promise
 interface Params {
-  params: {
-    id: string;
-  };
+  params: Promise<{ id: string }>;
 }
 
 // GET single transaction
 export async function GET(request: NextRequest, { params }: Params) {
   try {
+    // ✅ AWAIT the params first!
+    const { id } = await params;
+
     const transaction = await prisma.transaction.findUnique({
-      where: { id: parseInt(params.id) },
+      where: { id: parseInt(id) },
       include: {
         entries: {
           include: {
@@ -44,15 +46,17 @@ export async function GET(request: NextRequest, { params }: Params) {
   }
 }
 
-// PUT update transaction (complex - requires recalculating balances)
+// PUT update transaction
 export async function PUT(request: NextRequest, { params }: Params) {
   try {
+    // ✅ AWAIT the params first!
+    const { id } = await params;
     const body = await request.json();
     const { date, description, entries, reference } = body;
 
     // Get existing transaction with entries
     const existingTransaction = await prisma.transaction.findUnique({
-      where: { id: parseInt(params.id) },
+      where: { id: parseInt(id) },
       include: {
         entries: {
           include: {
@@ -96,12 +100,12 @@ export async function PUT(request: NextRequest, { params }: Params) {
 
       // 2. Delete old entries
       await tx.transactionEntry.deleteMany({
-        where: { transactionId: parseInt(params.id) },
+        where: { transactionId: parseInt(id) },
       });
 
       // 3. Update transaction details
       const updatedTransaction = await tx.transaction.update({
-        where: { id: parseInt(params.id) },
+        where: { id: parseInt(id) },
         data: {
           date: date ? new Date(date) : existingTransaction.date,
           description: description || existingTransaction.description,
@@ -122,7 +126,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
         newEntries.map(async (entry: any) => {
           return tx.transactionEntry.create({
             data: {
-              transactionId: parseInt(params.id),
+              transactionId: parseInt(id),
               accountId: entry.accountId,
               debit: entry.debit,
               credit: entry.credit,
@@ -174,9 +178,13 @@ export async function PUT(request: NextRequest, { params }: Params) {
 // DELETE transaction
 export async function DELETE(request: NextRequest, { params }: Params) {
   try {
+    // ✅ AWAIT the params first!
+    const { id } = await params;
+    console.log(`Deleting transaction ID: ${id}`);
+
     // Get transaction with entries before deleting
     const transaction = await prisma.transaction.findUnique({
-      where: { id: parseInt(params.id) },
+      where: { id: parseInt(id) },
       include: {
         entries: {
           include: {
@@ -215,7 +223,7 @@ export async function DELETE(request: NextRequest, { params }: Params) {
 
       // Delete transaction (entries cascade automatically)
       await tx.transaction.delete({
-        where: { id: parseInt(params.id) },
+        where: { id: parseInt(id) },
       });
     });
 
